@@ -9,7 +9,7 @@ version: "0.1.0"
 date-released: "2026-06-14"
 license: "MIT"
 repository-code: "https://github.com/gustavomulim/wavewell"
-doi: "[to be added after Zenodo release]"
+doi: "10.5281/zenodo.20687263"
 abstract: >
   Wavewell is a browser-based, install-free simulator of electron bound states
   in a GaAs/AlGaAs quantum well. It solves the time-independent Schrödinger
