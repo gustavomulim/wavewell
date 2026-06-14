@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quantum Well Explorer — Open Computational Science Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Spline+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f3ec; --paper-2:#efeae0; --ink:#181613; --ink-soft:#5b554c;
+    --line:#cfc8b8; --accent:#0f6f6b; --accent-2:#b5532a; --well:#9a9282;
+    --s1:#0f6f6b; --s2:#b5532a; --s3:#3a5a9c; --s4:#7a6a1f; --s5:#8a3a6b;
+    --shadow:0 1px 0 #fff, 0 2px 24px rgba(40,34,24,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Spline Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{background-image:radial-gradient(circle at 1px 1px, rgba(40,34,24,.04) 1px, transparent 0);background-size:22px 22px}
+  .wrap{max-width:1180px;margin:0 auto;padding:32px 24px 56px}
+  header.top{border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:26px;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+  .eyebrow{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(28px,4vw,46px);
+    line-height:1.02;margin:0;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--accent-2)}
+  .sub{color:var(--ink-soft);max-width:46ch;margin:10px 0 0;font-size:14.5px;line-height:1.5}
+  .tier-badge{font-family:"Spline Sans Mono",monospace;font-size:11px;border:1px solid var(--ink);
+    padding:7px 11px;white-space:nowrap;align-self:flex-start}
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:26px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow);padding:18px}
+  .plot-wrap{position:relative}
+  canvas{width:100%;height:auto;display:block}
+  .axis-label{font-family:"Spline Sans Mono",monospace;font-size:11px;color:var(--ink-soft)}
+  .controls h2,.states h2{font-family:"Fraunces",serif;font-weight:600;font-size:18px;margin:0 0 4px}
+  .controls .hint,.states .hint{color:var(--ink-soft);font-size:12.5px;margin:0 0 16px;line-height:1.45}
+  .field{margin:0 0 18px}
+  .field .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .field label{font-size:13.5px;font-weight:500}
+  .field .val{font-family:"Spline Sans Mono",monospace;font-size:13px;color:var(--accent)}
+  input[type=range]{width:100%;accent-color:var(--accent);height:22px;cursor:pointer}
+  .seg{display:flex;border:1px solid var(--ink);width:fit-content;margin-top:2px}
+  .seg button{font-family:"Spline Sans Mono",monospace;font-size:11.5px;letter-spacing:.04em;
+    background:transparent;border:0;padding:7px 12px;cursor:pointer;color:var(--ink)}
+  .seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+  .states ol{list-style:none;margin:6px 0 0;padding:0}
+  .states li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);
+    font-size:14px}
+  .swatch{width:12px;height:12px;border-radius:2px;flex:none}
+  .states .en{font-family:"Spline Sans Mono",monospace;margin-left:auto;color:var(--ink)}
+  .states .empty{color:var(--ink-soft);font-style:italic;font-size:13px;padding:10px 0}
+  .readout{font-family:"Spline Sans Mono",monospace;font-size:12px;color:var(--ink-soft);margin-top:14px;line-height:1.5}
+  footer.about{margin-top:30px;border-top:1px solid var(--line);padding-top:22px;
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px}
+  @media(max-width:860px){footer.about{grid-template-columns:1fr}}
+  footer.about h3{font-family:"Spline Sans Mono",monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+  footer.about p{margin:0;font-size:13px;line-height:1.55;color:var(--ink-soft)}
+  footer.about code{font-family:"Spline Sans Mono",monospace;font-size:12px;color:var(--ink)}
+  .reveal{opacity:0;transform:translateY(10px);animation:rise .6s ease forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.reveal{animation:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top reveal">
+    <div>
+      <p class="eyebrow">Open Computational Science Pipeline · Flagship Module</p>
+      <h1>Quantum Well <em>Explorer</em></h1>
+      <p class="sub">A browser-based, install-free simulation of electron bound states in a GaAs / AlGaAs
+        quantum well — the semiconductor heterostructure at the heart of lasers, detectors, and
+        high-mobility transistors. Move a slider; the Schrödinger equation is solved live.</p>
+    </div>
+    <div class="tier-badge">ADVANCED&nbsp;TIER&nbsp;·&nbsp;SEMICONDUCTOR&nbsp;BRIDGE</div>
+  </header>
+
+  <div class="grid">
+    <section class="panel plot-wrap reveal" style="animation-delay:.08s">
+      <canvas id="plot" width="720" height="520" role="img"
+        aria-label="Energy diagram of a quantum well showing the confining potential and the computed bound-state wavefunctions"></canvas>
+    </section>
+
+    <div>
+      <section class="panel controls reveal" style="animation-delay:.16s">
+        <h2>Parameters</h2>
+        <p class="hint">Each control changes the physical device. The bound-state energies are
+          recomputed from scratch — no lookup tables.</p>
+
+        <div class="field">
+          <div class="row"><label for="w">Well width</label><span class="val" id="wv">10.0 nm</span></div>
+          <input id="w" type="range" min="2" max="25" step="0.1" value="10" />
+        </div>
+        <div class="field">
+          <div class="row"><label for="x">Aluminium fraction&nbsp;<em>x</em> (barrier)</label><span class="val" id="xv">0.30</span></div>
+          <input id="x" type="range" min="0.10" max="0.45" step="0.01" value="0.30" />
+        </div>
+        <div class="field">
+          <div class="row"><label>Display</label></div>
+          <div class="seg" role="group" aria-label="Wavefunction display mode">
+            <button id="mPsi" aria-pressed="true">&#968; (x)</button>
+            <button id="mProb" aria-pressed="false">|&#968;|&sup2;</button>
+          </div>
+        </div>
+        <div class="readout" id="readout"></div>
+      </section>
+
+      <section class="panel states reveal" style="animation-delay:.24s" style="margin-top:0">
+        <h2>Bound states</h2>
+        <p class="hint">Confinement allows only discrete energies. A wider or deeper well admits more.</p>
+        <ol id="states"></ol>
+      </section>
+    </div>
+  </div>
+
+  <footer class="about reveal" style="animation-delay:.32s">
+    <div>
+      <h3>How it maps to the pipeline</h3>
+      <p><strong>Foundational:</strong> see that energy is quantised. <strong>Intermediate:</strong> change
+      parameters, read and export the data. <strong>Advanced:</strong> the numerical method
+      (Numerov integration with node-counting) is open in the source for students to read and modify.</p>
+    </div>
+    <div>
+      <h3>The model</h3>
+      <p>1-D time-independent Schrödinger equation in the effective-mass approximation
+      (GaAs <code>m* = 0.067 m&#8337;</code>). Barrier height uses the common conduction-band-offset
+      estimate <code>&#916;E&#8344; &#8776; 0.748&#8201;x</code> eV. Built to be read, not just run.</p>
+    </div>
+    <div>
+      <h3>Open &amp; free by design</h3>
+      <p>No install, no account, no licensed software — runs on any browser, including a low-cost
+      laptop in an under-resourced classroom. Intended for release under the
+      <code>MIT License</code> as a public, citable repository.</p>
+    </div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const HBAR2_2M = 0.0380998;   // eV*nm^2  (hbar^2 / 2 m_e)
+const MEFF = 0.067;           // GaAs effective mass (m*/m_e)
+const OFFSET = 0.748;         // conduction band offset coefficient (eV per unit x)
+
+function buildDomain(wellWidth){
+  const pad = Math.max(15, wellWidth);
+  const xMin = -(wellWidth/2 + pad), xMax = (wellWidth/2 + pad);
+  const N = 1600, h = (xMax - xMin)/(N-1);
+  const x = new Float64Array(N), V = new Float64Array(N);
+  for(let i=0;i<N;i++){ x[i]=xMin+i*h; V[i]=(Math.abs(x[i])<=wellWidth/2)?0:1; }
+  return {x,V,N,h,xMin,xMax};
+}
+function integrate(dom, V0, E){
+  const {V,N,h}=dom, k=MEFF/HBAR2_2M;
+  const psi=new Float64Array(N); psi[0]=0; psi[1]=1e-6;
+  const f=i=>k*(V[i]*V0 - E);
+  const c=i=>1 - h*h/12*f(i);
+  let nodes=0;
+  for(let i=1;i<N-1;i++){
+    psi[i+1]=(2*psi[i]*(1+5*h*h/12*f(i)) - psi[i-1]*c(i-1))/c(i+1);
+    if(psi[i+1]*psi[i]<0) nodes++;
+    if(Math.abs(psi[i+1])>1e12){ const s=1e12; for(let j=0;j<=i+1;j++) psi[j]/=s; }
+  }
+  return {nodes,psi};
+}
+function solve(dom, V0){
+  const Elow=1e-4, steps=500;
+  let prev=integrate(dom,V0,Elow).nodes, prevE=Elow;
+  const eigs=[];
+  for(let s=1;s<=steps;s++){
+    const E=Elow+(V0-Elow)*s/steps;
+    const nn=integrate(dom,V0,E).nodes;
+    while(nn>prev+eigs.filter(e=>e>=prevE&&e<=E).length && eigs.length<20){
+      let lo=prevE, hi=E, loN=prev;
+      for(let it=0;it<55;it++){ const m=0.5*(lo+hi); (integrate(dom,V0,m).nodes>loN)?hi=m:lo=m; }
+      eigs.push(0.5*(lo+hi));
+      if(eigs.length>nn) break;
+    }
+    prev=nn; prevE=E;
+  }
+  // normalize wavefunctions
+  return eigs.map(E=>{
+    const {psi}=integrate(dom,V0,E);
+    let s=0; for(let i=0;i<dom.N;i++) s+=psi[i]*psi[i]; s*=dom.h;
+    const norm=1/Math.sqrt(s); const w=new Float64Array(dom.N);
+    for(let i=0;i<dom.N;i++) w[i]=psi[i]*norm;
+    // sign convention: positive lobe up near center
+    if(w[Math.floor(dom.N/2)]<0) for(let i=0;i<dom.N;i++) w[i]=-w[i];
+    return {E,psi:w};
+  });
+}
+
+const SW=["#0f6f6b","#b5532a","#3a5a9c","#7a6a1f","#8a3a6b","#2f7d3a","#9c3a3a","#4a4a8a"];
+const cv=document.getElementById("plot"), ctx=cv.getContext("2d");
+let mode="psi";
+
+function draw(){
+  const wellWidth=+document.getElementById("w").value;
+  const x=+document.getElementById("x").value;
+  const V0=OFFSET*x;
+  document.getElementById("wv").textContent=wellWidth.toFixed(1)+" nm";
+  document.getElementById("xv").textContent=x.toFixed(2);
+
+  const dom=buildDomain(wellWidth);
+  const states=solve(dom,V0);
+
+  // display window
+  const dx = wellWidth/2 + Math.min(12, Math.max(6, wellWidth*0.8));
+  const xL=-dx, xR=dx;
+  const eTop=V0*1.18;
+  const W=cv.width, H=cv.height, m={l:58,r:18,t:18,b:42};
+  const px=v=>m.l+(v-xL)/(xR-xL)*(W-m.l-m.r);
+  const py=e=>H-m.b-(e/eTop)*(H-m.t-m.b);
+  ctx.clearRect(0,0,W,H);
+
+  // grid + axes
+  ctx.strokeStyle="#e2dccd"; ctx.lineWidth=1; ctx.fillStyle="#5b554c";
+  ctx.font="11px 'Spline Sans Mono', monospace";
+  const eStep = eTop>0.4?0.1:(eTop>0.15?0.05:0.02);
+  for(let e=0;e<=eTop+1e-9;e+=eStep){
+    ctx.beginPath(); ctx.moveTo(m.l,py(e)); ctx.lineTo(W-m.r,py(e)); ctx.stroke();
+    ctx.textAlign="right"; ctx.fillText(e.toFixed(2),m.l-8,py(e)+4);
+  }
+  ctx.textAlign="center";
+  for(let xx=Math.ceil(xL/5)*5; xx<=xR; xx+=5){ ctx.fillText(xx+"",px(xx),H-m.b+18); }
+  ctx.save(); ctx.translate(14,H/2); ctx.rotate(-Math.PI/2); ctx.textAlign="center";
+  ctx.fillText("Energy  (eV)",0,0); ctx.restore();
+  ctx.fillText("Position  x  (nm)",(m.l+W-m.r)/2,H-8);
+
+  // potential profile
+  ctx.strokeStyle="#8d8674"; ctx.lineWidth=2; ctx.beginPath();
+  ctx.moveTo(px(xL),py(V0)); ctx.lineTo(px(-wellWidth/2),py(V0));
+  ctx.lineTo(px(-wellWidth/2),py(0)); ctx.lineTo(px(wellWidth/2),py(0));
+  ctx.lineTo(px(wellWidth/2),py(V0)); ctx.lineTo(px(xR),py(V0)); ctx.stroke();
+  ctx.fillStyle="rgba(154,146,130,.10)";
+  ctx.fillRect(px(-wellWidth/2),py(V0),px(wellWidth/2)-px(-wellWidth/2),py(0)-py(V0));
+
+  // states
+  const amp=(eStep*0.9); // visual amplitude in eV units
+  states.forEach((st,idx)=>{
+    const col=SW[idx%SW.length];
+    ctx.strokeStyle=col; ctx.globalAlpha=.35; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(px(-wellWidth/2-2),py(st.E)); ctx.lineTo(px(wellWidth/2+2),py(st.E)); ctx.stroke();
+    ctx.globalAlpha=1;
+    // wavefunction
+    let maxv=0; for(let i=0;i<dom.N;i++){ const v=mode==="psi"?Math.abs(st.psi[i]):st.psi[i]*st.psi[i]; if(v>maxv)maxv=v; }
+    const sc=amp/maxv;
+    ctx.lineWidth=2; ctx.strokeStyle=col; ctx.beginPath();
+    let started=false;
+    for(let i=0;i<dom.N;i++){
+      if(dom.x[i]<xL||dom.x[i]>xR) continue;
+      const val=mode==="psi"?st.psi[i]:st.psi[i]*st.psi[i];
+      const yv=st.E+val*sc;
+      const X=px(dom.x[i]), Y=py(yv);
+      if(!started){ctx.moveTo(X,Y);started=true;} else ctx.lineTo(X,Y);
+    }
+    ctx.stroke();
+  });
+
+  // state list
+  const ol=document.getElementById("states"); ol.innerHTML="";
+  if(states.length===0){ ol.innerHTML='<div class="empty">No bound states — the well is too shallow or narrow. Widen it or raise x.</div>'; }
+  states.forEach((st,idx)=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="swatch" style="background:${SW[idx%SW.length]}"></span>
+      <span>n = ${idx+1}</span><span class="en">${(st.E*1000).toFixed(1)} meV</span>`;
+    ol.appendChild(li);
+  });
+  document.getElementById("readout").textContent =
+    `barrier height V0 = ${(V0*1000).toFixed(0)} meV  ·  ${states.length} bound state${states.length===1?"":"s"}  ·  grid: 1600 pts`;
+}
+
+["w","x"].forEach(id=>document.getElementById(id).addEventListener("input",draw));
+document.getElementById("mPsi").addEventListener("click",()=>{mode="psi";
+  document.getElementById("mPsi").setAttribute("aria-pressed","true");
+  document.getElementById("mProb").setAttribute("aria-pressed","false");draw();});
+document.getElementById("mProb").addEventListener("click",()=>{mode="prob";
+  document.getElementById("mProb").setAttribute("aria-pressed","true");
+  document.getElementById("mPsi").setAttribute("aria-pressed","false");draw();});
+draw();
+</script>
+</body>
+</html>
