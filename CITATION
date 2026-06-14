@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use Wavewell in teaching or research, please cite it as below."
+title: "Wavewell: an open browser-based quantum-well Schrödinger simulator for teaching computational physics"
+authors:
+  - family-names: "Venceslau"
+    given-names: "Gustavo Mulim"
+    orcid: "https://orcid.org/0009-0005-6911-9223"
+version: "0.1.0"
+date-released: "2026-06-14"
+license: "MIT"
+repository-code: "https://github.com/gustavomulim/wavewell"
+doi: "[to be added after Zenodo release]"
+abstract: >
+  Wavewell is a browser-based, install-free simulator of electron bound states
+  in a GaAs/AlGaAs quantum well. It solves the time-independent Schrödinger
+  equation live via Numerov integration with node-counting and bisection
+  eigenvalue search. The numerical method is exposed in open, commented source
+  so learners can progress from observing energy quantization to modifying the
+  algorithm themselves. Wavewell is the pilot module of a three-tier open
+  computational-science education pipeline spanning foundational data literacy
+  to advanced computational physics, designed for zero-cost adoption by
+  under-resourced institutions.
+keywords:
+  - physics education
+  - computational physics
+  - quantum well
+  - Schrödinger equation
+  - Numerov method
+  - open educational resource
+  - browser-based simulation
+  - semiconductor physics
