@@ -81,7 +81,7 @@ These limitations are features for pedagogy: learners are asked to identify wher
 
 If you use Wavewell in teaching or research, please cite it as:
 
-> Venceslau, G. M. (2026). *Wavewell: an open browser-based quantum-well Schrödinger simulator for teaching computational physics* (v0.1.1). [https://doi.org/10.5281/zenodo.21361266](https://doi.org/10.5281/zenodo.2zenodo.21361266)
+> Venceslau, G. M. (2026). *Wavewell: an open browser-based quantum-well Schrödinger simulator for teaching computational physics* (v0.1.1). [https://doi.org/10.5281/zenodo.21361266](https://doi.org/10.5281/zenodo.21361266)
 
 A `CITATION.cff` file is included in this repository for automated citation tools.
 
